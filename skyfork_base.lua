@@ -1,5 +1,5 @@
 
--- sky vr fork perma
+-- sky vr fork perma 2
 
 local loader = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
@@ -245,21 +245,31 @@ do
 	end)
 	FEScript(plr.Character)
 	plr.CharacterAdded:Connect(function(char)
-		task.defer(function() -- let the engine breathe a sec
-	
-			local lp = game.Players.LocalPlayer
-			if not lp then return end
-	
-			local pingStat = game:GetService("Stats"):FindFirstChild("Network") and game:GetService("Stats").Network:FindFirstChild("ServerStatsItem") and game:GetService("Stats").Network.ServerStatsItem:FindFirstChild("Data Ping")
-			local ping = pingStat and pingStat:GetValue() or 0
-	
-			replicatesignal(lp.ConnectDiedSignalBackend)
-			task.wait(math.max(game.Players.RespawnTime + (ping / 2500), 0))
-			replicatesignal(lp.Kill)
-	
-			FEScript(char)
-		end)
-	end)	
+
+		local hrp = char:WaitForChild("HumanoidRootPart")
+		local head = char:WaitForChild("Head")
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		local continueTping = true
+		--coroutine.wrap(function()
+		--	while continueTping do
+		--		task.wait()
+		--		hrp.CFrame = headpart.CFrame
+		--	end
+		--end)()
+
+		
+		task.wait(0.25)	
+		continueTping = false
+		for i,v in ipairs(hrp:GetChildren()) do
+			if v:IsA("Sound") then
+				v.Volume = 0
+			end
+		end
+		loadstring(game:HttpGet('https://github.com/GaMiR9195/SkyVR_fork/blob/main/permadeath.lua'))();
+
+		FEScript(char)
+	end)
+end
 
 TextLabel.Text = "Ready!"
 task.delay(5,function()
