@@ -1,5 +1,5 @@
 
--- sky vr base fork
+-- sky vr
 
 local loader = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
@@ -244,11 +244,32 @@ do
 		end
 	end)
 	FEScript(plr.Character)
-	plr.CharacterAdded:Connect(function()
-		replicatesignal(game.Players.LocalPlayer.ConnectDiedSignalBackend)
-		task.wait(math.max(game.Players.RespawnTime + (game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue() / 2500), 0))
-		replicatesignal(game.Players.LocalPlayer.Kill)
+	plr.CharacterAdded:Connect(function(char)
+
+		local hrp = char:WaitForChild("HumanoidRootPart")
+		local head = char:WaitForChild("Head")
+		local hum = char:FindFirstChildOfClass("Humanoid")
+		local continueTping = true
+		--coroutine.wrap(function()
+		--	while continueTping do
+		--		task.wait()
+		--		hrp.CFrame = headpart.CFrame
+		--	end
+		--end)()
+
+		
+		task.wait(0.25)	
+		continueTping = false
+		for i,v in ipairs(hrp:GetChildren()) do
+			if v:IsA("Sound") then
+				v.Volume = 0
+			end
+		end
+		char.Humanoid.Health = 0
+
+		FEScript(char)
 	end)
+end
 
 TextLabel.Text = "Ready!"
 task.delay(5,function()
