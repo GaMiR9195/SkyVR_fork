@@ -245,12 +245,21 @@ do
 	end)
 	FEScript(plr.Character)
 	plr.CharacterAdded:Connect(function(char)
-		replicatesignal(game.Players.LocalPlayer.ConnectDiedSignalBackend)
-		task.wait(math.max(game.Players.RespawnTime + (game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue() / 2500), 0))
-		replicatesignal(game.Players.LocalPlayer.Kill)
-		FEScript(char)
-	end)
-end
+		task.defer(function() -- let the engine breathe a sec
+	
+			local lp = game.Players.LocalPlayer
+			if not lp then return end
+	
+			local pingStat = game:GetService("Stats"):FindFirstChild("Network") and game:GetService("Stats").Network:FindFirstChild("ServerStatsItem") and game:GetService("Stats").Network.ServerStatsItem:FindFirstChild("Data Ping")
+			local ping = pingStat and pingStat:GetValue() or 0
+	
+			replicatesignal(lp.ConnectDiedSignalBackend)
+			task.wait(math.max(game.Players.RespawnTime + (ping / 2500), 0))
+			replicatesignal(lp.Kill)
+	
+			FEScript(char)
+		end)
+	end)	
 
 TextLabel.Text = "Ready!"
 task.delay(5,function()
