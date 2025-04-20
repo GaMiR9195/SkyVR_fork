@@ -1,5 +1,5 @@
 
--- sky vr fork perma 2
+-- sky vr
 
 local loader = Instance.new("ScreenGui")
 local Frame = Instance.new("Frame")
@@ -265,7 +265,7 @@ do
 				v.Volume = 0
 			end
 		end
-		loadstring(game:HttpGet('https://github.com/GaMiR9195/SkyVR_fork/blob/main/permadeath.lua'))();
+		char.Humanoid.Health = 0
 
 		FEScript(char)
 	end)
