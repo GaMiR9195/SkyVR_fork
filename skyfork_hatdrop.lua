@@ -317,23 +317,35 @@ getgenv().con2 = game:GetService("RunService").RenderStepped:connect(function()
 end)
 
 HatdropCallback(Player.Character, function(allhats)
-    for i,v in pairs(allhats) do
-        if not v[1]:FindFirstChild("Handle") then continue end
-        if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
+    for i, v in pairs(allhats) do
+        local hat = v[1]
+        local category = v[2]
+        local tag = v[3]
 
-        local align = Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])]) or CFrame.identity)
-        rightarmalign = v[2]=="right" and align or rightarmalign
+        if not hat:FindFirstChild("Handle") then continue end
+        if category == "headhats" then
+            hat.Handle.Transparency = options.HeadHatTransparency or 1
+        end
+
+        local align = Align(hat.Handle, parts[category], (category == "headhats" and getgenv()[category][tag]) or CFrame.identity)
+        rightarmalign = (category == "right") and align or rightarmalign
     end
 end)
 
 getgenv().conn = Player.CharacterAdded:Connect(function(Character)
-    HatdropCallback(Player.Character, function(allhats)
-        for i,v in pairs(allhats) do
-            if not v[1]:FindFirstChild("Handle") then continue end
-            if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
+    HatdropCallback(Character, function(allhats)
+        for i, v in pairs(allhats) do
+            local hat = v[1]
+            local category = v[2]
+            local tag = v[3]
 
-            local align = Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])]) or CFrame.identity)
-            rightarmalign = v[2]=="right" and align or rightarmalign
+            if not hat:FindFirstChild("Handle") then continue end
+            if category == "headhats" then
+                hat.Handle.Transparency = options.HeadHatTransparency or 1
+            end
+
+            local align = Align(hat.Handle, parts[category], (category == "headhats" and getgenv()[category][tag]) or CFrame.identity)
+            rightarmalign = (category == "right") and align or rightarmalign
         end
     end)
 end)
