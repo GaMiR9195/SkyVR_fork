@@ -87,7 +87,6 @@ end
 -- thanks chatgpt, i was too lazy to do this by myself (skyfork)
 function HatdropCallback(Character, callback)
     local fph = workspace.FallenPartsDestroyHeight
-
     local hrp = Character:WaitForChild("HumanoidRootPart")
     local humanoid = Character:WaitForChild("Humanoid")
     local torso = Character:FindFirstChild("UpperTorso") or Character:FindFirstChild("Torso")
@@ -116,33 +115,32 @@ function HatdropCallback(Character, callback)
         end
     end
 
+    -- ORIGINAL getAllHats STRUCTURE
     local allhats = {}
     local foundmeshids = {}
 
     for _, v in pairs(Character:GetChildren()) do
-        if v:IsA("Accessory") and v:FindFirstChild("Handle") then
-            local mesh = v.Handle:FindFirstChildOfClass("SpecialMesh")
-            if mesh then
-                local id, d = findMeshID(filterMeshID(mesh.MeshId))
-                local tag = "meshid:" .. filterMeshID(mesh.MeshId)
-                if foundmeshids[tag] then
-                    id = false
-                else
-                    foundmeshids[tag] = true
-                end
-                if id then
-                    table.insert(allhats, {v, d, tag})
-                else
-                    local nameMatch, d2 = findHatName(v.Name)
-                    if nameMatch then
-                        table.insert(allhats, {v, d2, v.Name})
-                    end
-                end
+        if not v:IsA("Accessory") then continue end
+        if not v:FindFirstChild("Handle") then continue end
+
+        local mesh = v.Handle:FindFirstChildOfClass("SpecialMesh")
+        if mesh then
+            local isMatch, category = findMeshID(filterMeshID(mesh.MeshId))
+            local tag = "meshid:"..filterMeshID(mesh.MeshId)
+            if foundmeshids[tag] then isMatch = false else foundmeshids[tag] = true end
+
+            if isMatch then
+                table.insert(allhats, {v, category, tag})
             else
-                local nameMatch, d2 = findHatName(v.Name)
-                if nameMatch then
-                    table.insert(allhats, {v, d2, v.Name})
+                local isName, category2 = findHatName(v.Name)
+                if isName then
+                    table.insert(allhats, {v, category2, v.Name})
                 end
+            end
+        else
+            local isName, category2 = findHatName(v.Name)
+            if isName then
+                table.insert(allhats, {v, category2, v.Name})
             end
         end
     end
@@ -208,10 +206,9 @@ function HatdropCallback(Character, callback)
     repeat
         local foundhandle = false
         for _, hat in pairs(allhats) do
-            local v = hat[1]
-            if v:FindFirstChild("Handle") then
+            if hat[1]:FindFirstChild("Handle") then
                 foundhandle = true
-                if v.Handle.CanCollide then
+                if hat[1].Handle.CanCollide then
                     dropped = true
                     break
                 end
@@ -225,19 +222,19 @@ function HatdropCallback(Character, callback)
         print("dropped")
         workspace.CurrentCamera.CameraSubject = campart
         for _, hat in pairs(allhats) do
-            local v = hat[1]
-            if v:IsA("Accessory") and v:FindFirstChild("Handle") and v.Handle.CanCollide then
+            local acc = hat[1]
+            if acc:IsA("Accessory") and acc:FindFirstChild("Handle") and acc.Handle.CanCollide then
                 spawn(function()
                     for _ = 1, 10 do
-                        v.Handle.CFrame = start
-                        v.Handle.Velocity = Vector3.new(0, 50, 0)
+                        acc.Handle.CFrame = start
+                        acc.Handle.Velocity = Vector3.new(0, 50, 0)
                         task.wait()
                     end
                 end)
             end
         end
     else
-        print("Hatdrop failed, your executor is sooo awful")
+        print("It failed, your executor is sooo awful")
     end
 
     callback(allhats)
@@ -317,35 +314,23 @@ getgenv().con2 = game:GetService("RunService").RenderStepped:connect(function()
 end)
 
 HatdropCallback(Player.Character, function(allhats)
-    for i, v in pairs(allhats) do
-        local hat = v[1]
-        local category = v[2]
-        local tag = v[3]
+    for i,v in pairs(allhats) do
+        if not v[1]:FindFirstChild("Handle") then continue end
+        if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
-        if not hat:FindFirstChild("Handle") then continue end
-        if category == "headhats" then
-            hat.Handle.Transparency = options.HeadHatTransparency or 1
-        end
-
-        local align = Align(hat.Handle, parts[category], (category == "headhats" and getgenv()[category][tag]) or CFrame.identity)
-        rightarmalign = (category == "right") and align or rightarmalign
+        local align = Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])]) or CFrame.identity)
+        rightarmalign = v[2]=="right" and align or rightarmalign
     end
 end)
 
 getgenv().conn = Player.CharacterAdded:Connect(function(Character)
-    HatdropCallback(Character, function(allhats)
-        for i, v in pairs(allhats) do
-            local hat = v[1]
-            local category = v[2]
-            local tag = v[3]
+    HatdropCallback(Player.Character, function(allhats)
+        for i,v in pairs(allhats) do
+            if not v[1]:FindFirstChild("Handle") then continue end
+            if v[2]=="headhats" then v[1].Handle.Transparency = options.HeadHatTransparency or 1 end
 
-            if not hat:FindFirstChild("Handle") then continue end
-            if category == "headhats" then
-                hat.Handle.Transparency = options.HeadHatTransparency or 1
-            end
-
-            local align = Align(hat.Handle, parts[category], (category == "headhats" and getgenv()[category][tag]) or CFrame.identity)
-            rightarmalign = (category == "right") and align or rightarmalign
+            local align = Align(v[1].Handle,parts[v[2]],((v[2]=="headhats")and getgenv()[v[2]][(v[3])]) or CFrame.identity)
+            rightarmalign = v[2]=="right" and align or rightarmalign
         end
     end)
 end)
