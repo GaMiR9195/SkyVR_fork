@@ -1,5 +1,11 @@
 -- skyfork ahhhdrop
 
+-- At the start of the script (replace the original declaration)
+local rightarmalign = {
+    SetVelocity = function() end,
+    SetCFrame = function() end
+}
+
 local function createpart(size, name,h)
 	local Part = Instance.new("Part")
 	Part.Parent = workspace
