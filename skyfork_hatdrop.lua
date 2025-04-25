@@ -192,7 +192,9 @@ function HatdropCallback(Character, callback)
 
     task.wait(0.25)
     humanoid:ChangeState(15)
-    torso.AncestryChanged:Wait()
+    if torso then
+    	torso.AncestryChanged:Wait()
+    end
 
     for _, v in pairs(locks) do v:Disconnect() end
     for _, hat in pairs(allhats) do updatestate(hat[1], 4) end
